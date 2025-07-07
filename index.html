@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdeaHub - Creative Community</title>
+    <style>
+        /* Base & Dark Aesthetic Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #000;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdm55ejJnbXR3djNxZnI2eGozMmx3YXN3eHdtaGpvemNmbmpsOWRhaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OAEyw55j0p3SSMG2yE/giphy.gif') center/cover no-repeat;
+            opacity: 0.25;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #6e00ff 0%, #ff00f7 100%);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sidebar-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #6e00ff, #ff00f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            list-style: none;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(110, 0, 255,0.1);
+            border-color: rgba(110, 0, 255, 0.2);
+            transform: scale(1.25);
+            box-shadow: 0 8px 25px rgba(110, 0, 255, 0.6);
+        }
+        
+        .sidebar-menu a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #6e00ff;
+        }
+
+        .sidebar-menu i {
+            width: 24px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        /* Top Right Account */
+        .top-right-account {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: none;
+        }
+
+        .account-btn {
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(2px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: all 0.8s ease;
+        }
+
+        .account-btn:hover {
+            background: rgba(110, 0, 255, 0.3);
+            border-color: rgba(110, 0, 255, 0.9);
+            box-shadow: 0 8px 25px rgba(110, 0, 255, 0.6);
+        }
+
+        .account-dropdown-top {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 180px;
+            background: rgba(15,15,25,0.95);
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .account-dropdown-top.active {
+            max-height: 200px;
+        }
+
+        .account-dropdown-top a {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #b0b0b0;
+            transition: all 0.3s;
+        }
+
+        .account-dropdown-top a:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(110, 0, 255, 0.6);
+        }
+
+        /* Floating Create Button */
+        .floating-create-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6e00ff 0%, #ff00f7 100%);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(110, 0, 255, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            box-shadow: 0 8px 25px rgba(110, 0, 255, 0.6);
+        }
+
+        .floating-create-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(110, 0, 255, 0.5);
+        }
+
+        /* Testimonials & Cards */
+        .testimonials {
+            margin-top: 40px;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .testimonials h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #6e00ff, #ff00f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .testimonial-card,
+        .card {
+            background: rgba(20, 20, 30, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card {
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(110, 0, 255, 0.6);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .testimonial-role {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .top-right-account {
+                display: block;
+            }
+            
+            .sidebar {
+                width: 50px;
+            }
+            
+            .sidebar-name {
+                display: none;
+            }
+            
+            .sidebar-header {
+                justify-content: center;
+                padding: 15px 5px;
+            }
+            
+            .sidebar-menu a {
+                justify-content: center;
+                padding: 15px 5px;
+            }
+            
+            .sidebar-menu a span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+                padding: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Right Account (Mobile Only) -->
+    <div class="top-right-account">
+        <div class="account-btn" id="topAccountToggle">
+            <i class="fas fa-user"></i>
+            <span class="account-text">Account</span>
+        </div>
+        <div class="account-dropdown-top">
+            <a href="#"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"></div>
+            <div class="sidebar-name">IdeaHub</div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active"><i class="fas fa-home"></i> <span>Home</span></a></li>
+            <li><a href="#"><i class="fas fa-map-marker-alt"></i> <span>Near You</span></a></li>
+            <li><a href="#"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
+            <li><a href="#"><i class="fas fa-fire"></i> <span>Trending</span></a></li>
+            <li><a href="#"><i class="fas fa-lightbulb"></i> <span>Ideas</span></a></li>
+            <li><a href="#"><i class="fas fa-users"></i> <span>Community</span></a></li>
+            <li><a href="#testimonials"><i class="fas fa-quote-left"></i> <span>Stories</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Discover Creative Ideas</h1>
+        <div class="cards-container" id="cardsContainer">
+            <!-- Cards will be generated here -->
+        </div>
+
+        <!-- Testimonials Section -->
+        <div class="testimonials" id="testimonials">
+            <h2>Real Impact Stories</h2>
+            
+            <div class="testimonial-card">
+                <p class="testimonial-text">
+                    "IdeaHub helped me connect with local designers to bring my sustainable packaging idea to life. 
+                    Within 3 months, we had a prototype that's now being tested by major retailers."
+                </p>
+                <div class="testimonial-author">- Maya Rodriguez</div>
+                <div class="testimonial-role">Eco-Entrepreneur, San Francisco</div>
+            </div>
+            
+            <div class="testimonial-card">
+                <p class="testimonial-text">
+                    "As a teacher, I used IdeaHub to crowdsource creative lesson plans. The community's input helped 
+                    me develop a STEM program that increased student engagement by 40%."
+                </p>
+                <div class="testimonial-author">- James Wilson</div>
+                <div class="testimonial-role">High School Educator, Chicago</div>
+            </div>
+            
+            <div class="testimonial-card">
+                <p class="testimonial-text">
+                    "Found my entire startup team through IdeaHub's 'Near You' feature. What began as a random 
+                    coffee meetup turned into a funded tech company solving food waste problems."
+                </p>
+                <div class="testimonial-author">- Priya Kapoor</div>
+                <div class="testimonial-role">Co-Founder, FreshCycle</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Create Button -->
+    <button class="floating-create-btn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script>
+        // Generate Sample Cards
+        const cardsContainer = document.getElementById('cardsContainer');
+        const ideas = [
+            {
+                title: "Urban Bee Sanctuary",
+                description: "Transform rooftop spaces into pollinator-friendly habitats with modular hive systems.",
+                tags: ["Eco", "Urban", "Community"]
+            },
+            {
+                title: "AI Art Curation",
+                description: "Platform that learns your aesthetic preferences to recommend emerging artists.",
+                tags: ["Tech", "Art", "AI"]
+            },
+            {
+                title: "Zero-Waste Grocery",
+                description: "App that connects shoppers with local package-free grocery options and recipes.",
+                tags: ["Food", "Eco", "Local"]
+            }
+        ];
+
+        function generateCards() {
+            cardsContainer.innerHTML = '';
+            ideas.forEach(idea => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h2>${idea.title}</h2>
+                    <p>${idea.description}</p>
+                    <div class="tags">${idea.tags.map(tag => 
+                        `<span class="tag">${tag}</span>`
+                    ).join('')}</div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // Account Dropdown Toggle
+        document.getElementById('topAccountToggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelector('.account-dropdown-top').classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.top-right-account')) {
+                document.querySelector('.account-dropdown-top').classList.remove('active');
+            }
+        });
+
+        // Initialize
+        generateCards();
+    </script>
+</body>
+</html>

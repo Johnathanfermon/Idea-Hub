@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Langdon's Idea Hub</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        :root {
+            /* Light/Dusk mode colors */
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --header-bg: #2c3e50;
+            --text-color: #333333;
+            --secondary-text: #7f8c8d;
+            --accent-color: #3498db;
+            --accent-hover: #2980b9;
+            --tag-bg: #e0f7fa;
+            --tag-text: #00838f;
+            --modal-bg: #ffffff;
+            --btn-secondary-bg: #e0e0e0;
+            --btn-secondary-text: #333333;
+            --btn-secondary-hover: #bdbdbd;
+            --review-card-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark/AMOLED mode colors */
+        body.dark-mode {
+            --bg-color: #000000;
+            --card-bg: #121212;
+            --header-bg: #000000;
+            --text-color: #e0e0e0;
+            --secondary-text: #b0b0b0;
+            --accent-color: #1a73e8;
+            --accent-hover: #0d5bbc;
+            --tag-bg: #1e3a5f;
+            --tag-text: #8ab4f8;
+            --modal-bg: #1e1e1e;
+            --btn-secondary-bg: #333333;
+            --btn-secondary-text: #e0e0e0;
+            --btn-secondary-hover: #444444;
+            --review-card-bg: #1a1a1a;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header styles */
+        header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        /* Navigation styles */
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--accent-color);
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-left: 1rem;
+            cursor: pointer;
+        }
+
+        .theme-toggle i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* User login button */
+        .user-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .user-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Main content */
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        .section-title {
+            margin: 3rem 0 1.5rem;
+            color: var(--text-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+
+        /* Cards grid */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Card styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 1.5rem;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            will-change: transform;
+        }
+
+        .card:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 10px 20px var(--shadow-color);
+           animation: juggle 1s ease-in-out infinite alternate; 
+        }
+
+        @keyframes juggle {
+            0% {
+                transform: scale(.95) rotate(-1deg) translateY(0);
+            }
+            100% {
+                transform: scale(1.05) rotate(3deg) translateY(-7px);
+            }
+        }
+
+        .card h2 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--secondary-text);
+            margin-bottom: 1rem;
+        }
+
+        .card .tag {
+            display: inline-block;
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Review cards */
+        .review-card {
+            background-color: var(--review-card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .review-place {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .star {
+            color: #ffc107;
+            margin-right: 0.2rem;
+        }
+
+        .review-author {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-text {
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Login modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            position: relative;
+        }
+
+        .modal h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+            border-color: var(--secondary-text);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--btn-secondary-hover);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary-text);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.25rem;
+            }
+
+            .header-right {
+                margin-top: 1rem;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span>Avant-</span>garde Ideas
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fas fa-map-marker-alt"></i> Near You</a></li>
+                <li><a href="#reviews"><i class="fas fa-star"></i> Reviews</a></li>
+                <li><a href="#"><i class="fas fa-fire"></i> Trending</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <div class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark Mode</span>
+            </div>
+            <button class="user-btn" id="loginBtn">
+                <i class="fas fa-user"></i>
+                <span>Login</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <h1>Discover Random Ideas</h1>
+        <div class="cards-container" id="cardsContainer">
+            <!-- Cards will be generated by JavaScript -->
+        </div>
+
+        <h2 class="section-title" id="reviews">Recent Reviews</h2>
+        <div class="reviews-container" id="reviewsContainer">
+            <!-- Reviews will be generated by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2>Welcome Back!</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="switchToSignup">Create Account</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeSignupModal">&times;</span>
+            <h2>Create an Account</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="switchToLogin">Already have an account?</button>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for cards
+        const ideas = [
+            {
+                title: "Sustainable Urban Gardening",
+                description: "Create small garden spaces in urban areas using recycled materials to promote sustainability.",
+                tags: ["Eco-friendly", "Community", "Urban"]
+            },
+            {
+                title: "AI-Powered Recipe Generator",
+                description: "An app that suggests recipes based on ingredients you already have at home.",
+                tags: ["Technology", "Food", "AI"]
+            },
+            {
+                title: "Virtual Book Swap",
+                description: "A platform where book lovers can exchange books virtually and have them delivered.",
+                tags: ["Reading", "Community", "Books"]
+            },
+            {
+                title: "Local Art Walk",
+                description: "Organize monthly art walks showcasing local artists in neighborhood businesses.",
+                tags: ["Art", "Local", "Culture"]
+            },
+            {
+                title: "Pet Sitting Cooperative",
+                description: "A community-based pet sitting service where members take turns caring for each other's pets.",
+                tags: ["Pets", "Community", "Animals"]
+            },
+            {
+                title: "Upcycled Fashion Pop-up",
+                description: "Temporary stores featuring clothing made from recycled materials by local designers.",
+                tags: ["Fashion", "Eco-friendly", "Design"]
+            }
+        ];
+
+        // Sample data for reviews
+        const reviews = [
+            {
+                place: "The Green Cafe",
+                rating: 4.5,
+                author: "Sarah J.",
+                date: "2 days ago",
+                text: "Lovely atmosphere and great vegan options. The matcha latte is amazing! Would definitely recommend for a cozy work session."
+            },
+            {
+                place: "Urban Park",
+                rating: 5,
+                author: "Michael T.",
+                date: "1 week ago",
+                text: "Beautiful park with excellent facilities. Perfect for morning runs or weekend picnics with family. The new sculpture garden is stunning."
+            },
+            {
+                place: "Tech Hub Co-working",
+                rating: 3.5,
+                author: "Alex P.",
+                date: "3 days ago",
+                text: "Good facilities but can get noisy during peak hours. The high-speed internet is reliable and the coffee is decent. Would be perfect with more quiet zones."
+            },
+            {
+                place: "Midnight Bookstore",
+                rating: 4,
+                author: "Emma L.",
+                date: "2 weeks ago",
+                text: "A book lover's paradise open late! Great selection of indie titles and the staff recommendations are always on point. The reading nooks are so cozy."
+            }
+        ];
+
+        // Generate cards
+        const cardsContainer = document.getElementById('cardsContainer');
+        const reviewsContainer = document.getElementById('reviewsContainer');
+        
+        function generateCards() {
+            // Shuffle ideas array
+            const shuffledIdeas = [...ideas].sort(() => 0.5 - Math.random());
+            
+            cardsContainer.innerHTML = '';
+            
+            shuffledIdeas.forEach(idea => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const tagsHTML = idea.tags.map(tag => 
+                    `<span class="tag">${tag}</span>`
+                ).join('');
+                
+                card.innerHTML = `
+                    <h2>${idea.title}</h2>
+                    <p>${idea.description}</p>
+                    <div>${tagsHTML}</div>
+                `;
+                
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // Generate reviews
+        function generateReviews() {
+            reviewsContainer.innerHTML = '';
+            
+            reviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                
+                // Generate star rating
+                const stars = [];
+                const fullStars = Math.floor(review.rating);
+                const hasHalfStar = review.rating % 1 >= 0.5;
+                
+                for (let i = 0; i < fullStars; i++) {
+                    stars.push('<i class="fas fa-star star"></i>');
+                }
+                
+                if (hasHalfStar) {
+                    stars.push('<i class="fas fa-star-half-alt star"></i>');
+                }
+                
+                const emptyStars = 5 - stars.length;
+                for (let i = 0; i < emptyStars; i++) {
+                    stars.push('<i class="far fa-star star"></i>');
+                }
+                
+                reviewCard.innerHTML = `
+                    <div class="review-header">
+                        <div class="review-place">${review.place}</div>
+                        <div class="review-rating">
+                            ${stars.join('')}
+                            <span>${review.rating}</span>
+                        </div>
+                    </div>
+                    <div class="review-author">By ${review.author} • ${review.date}</div>
+                    <div class="review-text">${review.text}</div>
+                `;
+                
+                reviewsContainer.appendChild(reviewCard);
+            });
+        }
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or use preferred color scheme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Modal functionality
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const closeModal = document.getElementById('closeModal');
+        const closeSignupModal = document.getElementById('closeSignupModal');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        closeSignupModal.addEventListener('click', () => {
+            signupModal.style.display = 'none';
+        });
+
+        switchToSignup.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+            signupModal.style.display = 'flex';
+        });
+
+        switchToLogin.addEventListener('click', () => {
+            signupModal.style.display = 'none';
+            loginModal.style.display = 'flex';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (e.target === signupModal) {
+                signupModal.style.display = 'none';
+            }
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Login functionality would go here!');
+            loginModal.style.display = 'none';
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Signup functionality would go here!');
+            signupModal.style.display = 'none';
+        });
+
+        // Initialize the page
+        generateCards();
+        generateReviews();
+
+        // Bonus: Change cards every 30 seconds
+        setInterval(generateCards, 30000);
+    </script>
+</body>
+</html>
